@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/07 10:22:24 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/14 12:40:31 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/15 11:50:13 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 
 int	ft_cases(char *command, t_data *data)
 {
-	write(2, "cases\n", 6);
 	if (command == NULL)
 	{
 		//printf("3exit\n");
@@ -24,7 +23,7 @@ int	ft_cases(char *command, t_data *data)
 	}
 	if (ft_strncmp_sh(command, "exit", 4))
 	{
-		printf("2exit\n");
+		printf("exit\n");
 		exit (0);
 	}
 	else if (ft_strncmp_sh(command, "env", 3))
@@ -46,6 +45,7 @@ int	ft_cases(char *command, t_data *data)
 
 void	ft_new_line(void)
 {
+	write(2, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
@@ -83,7 +83,6 @@ int	main(int argc, char *argv[], char *env[])
 		str = readline("Notreallyshell > ");
 		add_history(str);
 		command = ft_split(str, '|');
-		ft_superprintf(command);
 		ft_clean_command2(&data, command);
 		ft_init(&data, command);
 		free (str);

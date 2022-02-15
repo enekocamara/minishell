@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/07 10:55:18 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/14 12:47:40 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/15 11:43:21 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ typedef struct s_data
 void	sighandler(int signal, siginfo_t *a, void *b);
 void 	rl_replace_line(const char *a, int b);
 int		ft_cases(char *command, t_data *data);
-void	ft_recursive_child(t_data *data, char **command, int command_line, t_pipes *pipes);
+void	ft_rc(t_data *data, char **c, int i, int fd[2][2]);
 
 /*----------------UTILS-----------------*/
 
