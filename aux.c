@@ -1,24 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   aux2.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/02/11 13:02:20 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/18 14:11:19 by ecamara          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
 /*   aux.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/08 12:25:47 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/18 13:59:48 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/18 14:57:58 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,15 +147,6 @@ void	ft_init(t_data *data, char **command)
 	ft_rc(data, command, 0, fd);
 }
 
-
-
-
-
-
-
-
-
-
 void	ft_clean_command2(t_data *data, char **command)
 {
 	int	c;
@@ -181,56 +160,111 @@ void	ft_clean_command2(t_data *data, char **command)
 	}
 }
 
-void	ft_bucle(t_data *data, char **pipes, int x, int y)
+void	ft_allocate2(char *pipes, int x, int y, int z)
+{
+	int		i;
+	int		z;
+
+	i = 0;
+	z = 0;
+	while (pipes[i++])
+	{
+		if (pipes[i] == '\'' || pipes[i] == '\"')
+		{
+			i += ft_pass(pipes + i, pipes[i]);
+
+		}
+		if (pipes[i] == '\'' || pipes[i] == '\"')
+		{
+			i += ft_pass(pipes + i, pipes[i]);
+			
+		}
+		if (pipes[i] == '\'' || pipes[i] == '\"')
+		{
+			i += ft_pass(pipes + i, pipes[i]);
+			
+		}	
+	}
+}
+
+void	allocate(t_data *data, char **pipes)
 {
 	int	i;
-	int	j;
 	int	z;
+	int	y;
+	int	x;
+
+	i = 0;
+	while (pipes[i] != NULL)
+		i++;
+	data->input = malloc(sizeof(t_files) * i);
+	data->output = malloc(sizeof(t_files) * i);
+	data->commands = malloc(sizeof(char **) * i);
+	i = 0;
+	while (pipes[i] != NULL)
+	{
+		ft_allocate2(pipes[i], &x, &y, &z);
+		data->input->files = malloc(sizeof(char *) * x);
+		data->input->modes = malloc(sizeof(char *) * x);
+		data->output->files = malloc(sizeof(char *) * y);
+		data->output->modes = malloc(sizeof(char *) * y);
+		data->commands[i] = malloc(sizeof(char *) * (z + 1));
+		data->commands[i][z] = NULL;
+		i++;
+	}
+}
+
+void	ft_bucle(t_data *data,char *command, int x, int y)
+{
+	int		i;
+	int		j;
+	int		z;
+	char	**pipes;
 
 	i = 0;
 	j = 0;
 	z = 0;
-	while (pipes[j] != NULL)
+	pipes = ft_split_ms(command);
+	ft_allocate(data, pipes);
+	while (pipes[j++] != NULL)
 	{
-		while (pipes[j][i])
+		while (pipes[j][i++])
 		{
 			if ('>' == pipes[j][i])
-				i = ft_output(pipes[j] + i, data, &y);
+				i += ft_output(pipes[j] + i, data, &y, j);
 			else if ('<' == pipes[j][i])
-				i = ft_input(pipes[j] + i, data, &x);
+				i += ft_input(pipes[j] + i, data, &x, j);
 			else
-				i = ft_command(pipes[j] + i, data, &z);
-			i++;
+				i += ft_command(pipes[j] + i, data, &z, j);
 		}
-		j++;
 	}
 }
 
-int	ft_input(char *str, t_data *data, int *y)
+int	ft_input(char *str, t_data *data, int *y, int j)
 {
 	int	i;
 	int	index;
 
 	i = 0;
-	if (str[1] == '<')
+	if (str[1] == '>')
 	{
-		data->input.modes[*y] = 1;
+		data->input[j].modes[*y] = 1;
 		index = 2;
 	}
 	else
 	{
-		data->input.modes[*y] = 0;
+		data->input[j].modes[*y] = 0;
 		index = 1;
 	}
 	while (str[index + i] != '<' || str[index + i] != '>'
 		|| str[index + i] != '\0' || str[index + i] != ' ')
 		i++;
-	data->input.files[*y] = ft_substr(str, index, i);
+	data->input[j].files[*y] = ft_substr(str, index, i);
 	(*y)++;
 	return (i + index);
 }
 
-int	ft_output(char *str, t_data *data, int *x)
+int	ft_output(char *str, t_data *data, int *x, int j)
 {
 	int	i;
 	int	index;
@@ -238,18 +272,18 @@ int	ft_output(char *str, t_data *data, int *x)
 	i = 0;
 	if (!str[1] == '>')
 	{
-		data->output.modes[*x] = 1;
+		data->output[j].modes[*x] = 1;
 		index = 2;
 	}
 	else
 	{
-		data->output.modes[*x] = 0;
+		data->output[j].modes[*x] = 0;
 		index = 1;
 	}
 	while (str[index + i] != '<' || str[index + i] != '>'
 		|| str[index + i] != '\0' || str[index + i] != ' ')
 		i++;
-	data->output.files[*x] = ft_substr(str, index, i);
+	data->output[j].files[*x] = ft_suindexstr(str, 0, i);
 	(*x)++;
 	return (i + index);
 }
