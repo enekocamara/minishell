@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/08 12:25:47 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/18 14:57:58 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/18 15:05:31 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ void	ft_clean_command2(t_data *data, char **command)
 	}
 }
 
-void	ft_allocate2(char *pipes, int x, int y, int z)
+void	ft_allocate3(char *pipes, int x, int y, int z)
 {
 	int		i;
 	int		z;
@@ -187,7 +187,20 @@ void	ft_allocate2(char *pipes, int x, int y, int z)
 	}
 }
 
-void	allocate(t_data *data, char **pipes)
+void	ft_allocate1(t_data  *data,  char **pipes)
+{
+	int	i;
+
+	i = 0;
+	while (pipes[i] != NULL)
+		i++;
+	data->input = malloc(sizeof(t_files) * i);
+	data->output = malloc(sizeof(t_files) * i);
+	data->commands = malloc(sizeof(char **) * i);
+	ft_allocate2(data, pipes);
+}
+
+void	allocate2(t_data *data, char **pipes)
 {
 	int	i;
 	int	z;
@@ -196,13 +209,10 @@ void	allocate(t_data *data, char **pipes)
 
 	i = 0;
 	while (pipes[i] != NULL)
-		i++;
-	data->input = malloc(sizeof(t_files) * i);
-	data->output = malloc(sizeof(t_files) * i);
-	data->commands = malloc(sizeof(char **) * i);
-	i = 0;
-	while (pipes[i] != NULL)
 	{
+		x = 0;
+		y = 0;
+		z = 0;
 		ft_allocate2(pipes[i], &x, &y, &z);
 		data->input->files = malloc(sizeof(char *) * x);
 		data->input->modes = malloc(sizeof(char *) * x);
