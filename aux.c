@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/08 12:25:47 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/18 15:05:31 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/18 15:23:56 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,20 @@ void	ft_clean_command2(t_data *data, char **command)
 	}
 }
 
-void	ft_allocate3(char *pipes, int x, int y, int z)
+int	ft_pass2(char *str, char c)
+{
+	int i;
+
+	i = 1;
+	if (str[i] == c)
+		i++;
+	while (str[i] != '<' || str[i] != '>'
+		|| str[i] != '\0' || str[i] != ' ')
+		i++;
+	return (i);
+}
+
+void	ft_allocate3(char *pipes, int *x, int *y, int *z)
 {
 	int		i;
 	int		z;
@@ -169,23 +182,24 @@ void	ft_allocate3(char *pipes, int x, int y, int z)
 	z = 0;
 	while (pipes[i++])
 	{
-		if (pipes[i] == '\'' || pipes[i] == '\"')
+		if (pipes[i] == '<')
 		{
-			i += ft_pass(pipes + i, pipes[i]);
-
+			i += ft_pass2(pipes + i, pipes[i]);
+			(*x)++;
 		}
-		if (pipes[i] == '\'' || pipes[i] == '\"')
+		else if (pipes[i] == '>')
 		{
-			i += ft_pass(pipes + i, pipes[i]);
-			
+			i += ft_pass2(pipes + i, pipes[i]);
+			(*y)++;
 		}
-		if (pipes[i] == '\'' || pipes[i] == '\"')
+		else
 		{
 			i += ft_pass(pipes + i, pipes[i]);
-			
-		}	
+			(*z)++;
+		}
 	}
 }
+
 
 void	ft_allocate1(t_data  *data,  char **pipes)
 {
@@ -213,7 +227,7 @@ void	allocate2(t_data *data, char **pipes)
 		x = 0;
 		y = 0;
 		z = 0;
-		ft_allocate2(pipes[i], &x, &y, &z);
+		ft_allocate3(pipes[i], &x, &y, &z);
 		data->input->files = malloc(sizeof(char *) * x);
 		data->input->modes = malloc(sizeof(char *) * x);
 		data->output->files = malloc(sizeof(char *) * y);
