@@ -1,12 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
+/*   aux2.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/02/11 13:02:20 by ecamara           #+#    #+#             */
+/*   Updated: 2022/02/18 14:11:19 by ecamara          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
 /*   aux.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/08 12:25:47 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/15 12:50:19 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/18 13:59:48 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +76,7 @@ static void	ft_search_command(t_data *data, char *command)
 	char	**parameter;
 	int		c;
 
-	c = 0;
+	c = 0;-
 	parameter = ft_split(command, ' ');
 	ft_clean_parameter(parameter);
 	ft_putstr(parameter[1]);
@@ -147,6 +159,15 @@ void	ft_init(t_data *data, char **command)
 	ft_rc(data, command, 0, fd);
 }
 
+
+
+
+
+
+
+
+
+
 void	ft_clean_command2(t_data *data, char **command)
 {
 	int	c;
@@ -159,3 +180,82 @@ void	ft_clean_command2(t_data *data, char **command)
 		c++;
 	}
 }
+
+void	ft_bucle(t_data *data, char **pipes, int x, int y)
+{
+	int	i;
+	int	j;
+	int	z;
+
+	i = 0;
+	j = 0;
+	z = 0;
+	while (pipes[j] != NULL)
+	{
+		while (pipes[j][i])
+		{
+			if ('>' == pipes[j][i])
+				i = ft_output(pipes[j] + i, data, &y);
+			else if ('<' == pipes[j][i])
+				i = ft_input(pipes[j] + i, data, &x);
+			else
+				i = ft_command(pipes[j] + i, data, &z);
+			i++;
+		}
+		j++;
+	}
+}
+
+int	ft_input(char *str, t_data *data, int *y)
+{
+	int	i;
+	int	index;
+
+	i = 0;
+	if (str[1] == '<')
+	{
+		data->input.modes[*y] = 1;
+		index = 2;
+	}
+	else
+	{
+		data->input.modes[*y] = 0;
+		index = 1;
+	}
+	while (str[index + i] != '<' || str[index + i] != '>'
+		|| str[index + i] != '\0' || str[index + i] != ' ')
+		i++;
+	data->input.files[*y] = ft_substr(str, index, i);
+	(*y)++;
+	return (i + index);
+}
+
+int	ft_output(char *str, t_data *data, int *x)
+{
+	int	i;
+	int	index;
+
+	i = 0;
+	if (!str[1] == '>')
+	{
+		data->output.modes[*x] = 1;
+		index = 2;
+	}
+	else
+	{
+		data->output.modes[*x] = 0;
+		index = 1;
+	}
+	while (str[index + i] != '<' || str[index + i] != '>'
+		|| str[index + i] != '\0' || str[index + i] != ' ')
+		i++;
+	data->output.files[*x] = ft_substr(str, index, i);
+	(*x)++;
+	return (i + index);
+}
+
+int	ft_(char *str, t_data *data, int * z)
+{
+
+}
+	//comillas, 0bli	//excuve
