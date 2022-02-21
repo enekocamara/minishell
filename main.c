@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/07 10:22:24 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/15 11:50:13 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/21 14:24:43 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ int	main(int argc, char *argv[], char *env[])
 	char				*str;
 	t_data				data;
 	struct sigaction	sa;
-	char				**command;
 
 	(void)argv;
 	(void)argc;
@@ -77,15 +76,18 @@ int	main(int argc, char *argv[], char *env[])
 	//rl_catch_signals = 0;
 	sigaction(SIGQUIT, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
-	data.counter = -1;
+	data.counter = 0;
 	while (1)
 	{
 		str = readline("Notreallyshell > ");
 		add_history(str);
-		command = ft_split(str, '|');
-		ft_clean_command2(&data, command);
-		ft_init(&data, command);
+		//command = ft_split(str, '|');
+		//ft_clean_command2(&data, command);
+		ft_bucle(&data, str, 0, 0);
+		//ft_print_data(&data);
+		ft_init(&data);
+		//ft_print_data(&data);
 		free (str);
-		ft_superfree(command);
+		//ft_superfree(command);
 	}
 }

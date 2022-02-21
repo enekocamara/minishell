@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/07 10:55:18 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/15 11:43:21 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/21 14:12:42 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,12 @@ typedef struct s_pipes
 	int	pipe0[2];
 	int	pipe1[2];
 }t_pipes;
+typedef struct s_files
+{
+	char	**files;
+	int		*modes;
+	int		id;
+}t_files;
 
 typedef struct s_data
 {
@@ -39,12 +45,15 @@ typedef struct s_data
 	int		pid;
 	int		input_pipe;
 	int		counter;
+	char	***commands;
+	t_files	*input;
+	t_files	*output;
 }t_data;
 
 void	sighandler(int signal, siginfo_t *a, void *b);
-void 	rl_replace_line(const char *a, int b);
+void	rl_replace_line(const char *a, int b);
 int		ft_cases(char *command, t_data *data);
-void	ft_rc(t_data *data, char **c, int i, int fd[2][2]);
+void	ft_rc(t_data *data, int i, int fd[2][2]);
 
 /*----------------UTILS-----------------*/
 
@@ -60,8 +69,16 @@ void	ft_echo(int boo, char *str);
 void	ft_cd(char *str);
 
 /*---------------AUX-------------------*/
-void	ft_init( t_data *data, char **command);
+void	ft_init( t_data *data);
 void	ft_new_line(void);
 void	ft_clean_command2(t_data *data, char **command);
+void	ft_print_data(t_data *data);
+int		ft_command(char *str, t_data *data, int *z, int j);
+int		ft_output(char *str, t_data *data, int *x, int j);
+int		ft_input(char *str, t_data *data, int *y, int j);
+void	ft_bucle(t_data *data, char *command, int x, int y);
+int		ft_pass(char *str, char c);
+char	**ft_split_ms(char *s, char c);
+void	ft_allocate2(t_data *data, char **pipes);
 
 #endif

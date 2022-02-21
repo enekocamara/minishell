@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/18 14:07:50 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/18 14:07:57 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/21 14:19:09 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ int	ft_pass(char *str, char c)
 		i++;
 	return (i);
 }
-static unsigned int	count(const char *s, char c)
+int	count_ms(char *s, char c)
 {
-	unsigned int	i;
-	unsigned int	j;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;
@@ -55,7 +55,7 @@ static unsigned int	count(const char *s, char c)
 	return (i);
 }
 
-static char	**str(const char *str, unsigned int j, char c, char **list)
+char	**str_ms(char *str, int j, char c, char **list)
 {
 	unsigned int	i;
 	unsigned int	index;
@@ -63,7 +63,7 @@ static char	**str(const char *str, unsigned int j, char c, char **list)
 
 	i = 0 ;
 	r = 0;
-	while (j < count(str, c))
+	while (j < count_ms(str, c))
 	{
 		if (str[i] != c && r == 0)
 		{
@@ -84,21 +84,21 @@ static char	**str(const char *str, unsigned int j, char c, char **list)
 	return (list);
 }
 
-char	**ft_split(char const *s, char c)
+char	**ft_split_ms(char *s, char c)
 {
-	long int		i;
-	unsigned int	j;
-	char			**list;
+	long int	i;
+	int			j;
+	char		**list;
 
 	j = 0;
 	if (!s)
 		return (NULL);
 	else
 	{
-		i = count(s, c);
+		i = count_ms(s, c);
 		list = (char **)malloc(sizeof(char *) * (i + 1));
 		if (!list)
 			return (NULL);
 	}
-	return (str(s, j, c, list));
+	return (str_ms(s, j, c, list));
 }

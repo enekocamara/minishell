@@ -6,7 +6,7 @@
 #    By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/01/07 11:49:38 by cdiaz-fl          #+#    #+#              #
-#    Updated: 2022/02/14 11:44:01 by ecamara          ###   ########.fr        #
+#    Updated: 2022/02/21 12:01:32 by ecamara          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,9 +25,10 @@ SRCS	=	main.c\
 			minishell_utils.c \
 			aux.c\
 			functions.c\
+			split_ms.c
 		
 OBJS	= ${SRCS:.c=.o}
-SNAME	= fsanitize
+SNAME	= -fsanitize=address
 RM		= rm -rf
 CC		= gcc
 RED		= \033[0;31m
@@ -38,13 +39,13 @@ LIBFT	= -C ./libft
             -lreadline\
             -L/sgoinfre/goinfre/Perso/$(USER)/homebrew/opt/readline/lib\
 SFLAGS  = -fsanitize=address -g3
-CFLAGS  = -Wall -Werror -Wextra 
+CFLAGS  = -g3 -Wall -Werror -Wextra
 LDFLAGS = -lreadline -L/Users/$(USER)/.brew/opt/readline/lib/ -I/Users/$(USER)/.brew/opt/readline/include/readline/
 all: $(NAME)
 $(NAME) : $(OBJS)
 		echo "$(RED)Compiling...				⏳$(WHITE)"
 		make  ${LIBFT}/
-		$(CC) ${CFLAGS} ${LDFLAGS} $^ -I. ./libft/libft.a -o $@    
+		$(CC) ${CFLAGS} ${LDFLAGS} $(SNAME) $^ -I. ./libft/libft.a -o $@    
 %.o: %.c
 	$(CC) ${CFLAGS} -I/sgoinfre/goinfre/Perso/$(USER)/homebrew/opt/readline/include -I/sgoinfre/goinfre/Perso/$(USER)/homebrew/opt/readline/lib -c $< -o $@
 
