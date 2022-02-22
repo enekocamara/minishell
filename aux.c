@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/08 12:25:47 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/21 14:50:41 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/02/22 14:24:48 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,16 +82,17 @@ static void	ft_search_command(t_data *data, char **command)
 	exit (0);
 }
 
-void	ft_rc2(t_data *data, int i, int fd[2][2])
+void	ft_rc2(t_data *data)
 {
-	close(fd[1][1]);
-	close(fd[0][1]);
+	close(data->fd[1][1]);
+	close(data->fd[0][1]);
 	data->input_pipe = 1;
-	if (data->commands[data->counter][i] != NULL)
+	if (data->commands[data->counter] != NULL)
 	{
-		fd[0][0] = fd[1][0];
-		pipe(fd[1]);
-		ft_rc(data, i, fd);
+		data->fd[0][0] = data->fd[1][0];
+		pipe(data->fd[1]);
+		data->counter++;
+		ft_rc(data);
 	}
 }
 
@@ -104,70 +105,82 @@ void	ft_error_child(int w)
 	}
 }
 
-ft_input_c(t_data *data, int *fd[2][2])
+void	ft_input_c(t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (data->input[data->counter].files[i] != NULL)
+	if (data->input_pipe)
+		return ;
+	else if (!data->input[data->counter].id)
+		dup2(data->fd[0][0], STDIN_FILENO);
+	else
 	{
-		if(data->input[data->counter].modes[i] == 0)
+		while (data->input[data->counter].files[i] != NULL)
 		{
-			(*fd)[0][1] = open(data->input[data->counter].files[i], O_RDONLY);
-			dup2((*fd)[0][0], STDIN_FILENO);
+			if(data->input[data->counter].modes[i] == 1)
+			{
+				data->fd[0][1] = open(data->input[data->counter].files[i], O_RDONLY);
+				dup2(data->fd[0][0], STDIN_FILENO);
+			}
+			i++;
 		}
-		i++;
 	}
 }
 
-void	ft_output_c(t_data *data, int fd[2][2])
+void	ft_output_c(t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (data->output[data->counter].files[i] != NULL)
+	if (data->commands[data->counter + 1] == NULL)
+		return ;
+	if (!data->output[data->counter].id)
+		dup2(data->fd[1][1], STDOUT_FILENO);
+	else
 	{
-		//if(data->output[data->counter].modes[i] == 0)
-			dup2(fd[1][1], STDOUT_FILENO);
-		i++;
+		while (data->output[data->counter].files[i] != NULL)
+		{
+			//if(data->output[data->counter].modes[i] == 0)
+			dup2(data->fd[1][1], STDOUT_FILENO);
+			i++;
+		}
 	}
 }
 
-void	ft_rc(t_data *data, int i, int fd[2][2])
+void	ft_rc(t_data *data)
 {
 	int	status;
 
-	close(fd[0][1]);
+	close(data->fd[0][1]);
 	data->pid = fork();
 	if (data->pid == -1)
 		return ;
 	if (data->pid == 0)
 	{
-		ft_input_c(data, &fd);
-		ft_output_c(data, fd);
-		close(fd[1][1]);
-		close(fd[1][0]);
-		close(fd[0][1]);
-		close(fd[0][0]);
-		if (ft_cases(data->commands[data->counter][i], data))
+		ft_input_c(data);
+		ft_output_c(data);
+		close(data->fd[1][1]);
+		close(data->fd[1][0]);
+		close(data->fd[0][1]);
+		close(data->fd[0][0]);
+		if (data->commands[data->counter] && ft_cases(data->commands[data->counter][0], data))
 			exit (0);
 		ft_search_command(data, data->commands[data->counter]);
 	}
 	else
 	{
 		ft_error_child(waitpid(data->pid, &status, 0));
-		ft_rc2(data, i + 1, fd);
+		ft_rc2(data);
 	}
 }
 
 void	ft_init(t_data *data)
 {
-	int	fd[2][2];
-
-	pipe(fd[0]);
-	pipe(fd[1]);
+	pipe(data->fd[0]);
+	pipe(data->fd[1]);
 	data->input_pipe = 0;
-	ft_rc(data, 0, fd);
+	ft_rc(data);
 }
 
 void	ft_clean_command2(t_data *data, char **command)
@@ -252,14 +265,13 @@ void	ft_allocate1(t_data  *data,  char **pipes)
 		i++;
 	data->input = malloc(sizeof(t_files) * (i + 1));
 	data->output = malloc(sizeof(t_files) * (i + 1));
-	data->commands = malloc(sizeof(char **) * i);
-	data->input[i].id = 0;
-	data->output[i].id = 0;
+	data->commands = (char ***)malloc(sizeof(char **) * (i + 1));
+	data->commands[i] = NULL;
 	j = 0;
-	while (j < i)
+	while (j <= i)
 	{
-		data->input[j].id = 1;
-		data->output[j].id = 1;
+		data->input[j].id = 0;
+		data->output[j].id = 0;
 		j++;
 	}
 	ft_allocate2(data, pipes);
@@ -301,22 +313,24 @@ void	ft_bucle(t_data *data,char *command, int x, int y)
 	int		z;
 	char	**pipes;
 
-	i = 0;
 	j = 0;
-	z = 0;
 	pipes = ft_split_ms(command, '|');
 	ft_allocate1(data, pipes);
 	while (pipes[j] != NULL)
 	{
-		while (pipes[j][i])
+		i = 0;
+		x = 0;
+		y = 0;
+		z = 0;
+		while (pipes[j][i] != '\0')
 		{
 			if ('>' == pipes[j][i])
 				i += ft_output(pipes[j] + i + 1, data, &x, j);
 			else if ('<' == pipes[j][i])
 				i += ft_input(pipes[j] + i + 1, data, &y, j);
-			else if (' ' != pipes[j][i] && '>' != pipes[j][i] && '<' != pipes[j][i])
+			else if (32 != pipes[j][i])
 			{
-				i += ft_command(pipes[j] + i, data, &z, j);
+				i += ft_command((pipes[j]) + i, data, &z, j);
 			}
 			else
 				i++;
@@ -331,6 +345,7 @@ int	ft_input(char *str, t_data *data, int *y, int j)
 	int	index;
 
 	i = 0;
+	data->input[j].id = 1;
 	if (str[0] == '<')
 	{
 		data->input[j].modes[*y] = 1;
@@ -346,7 +361,6 @@ int	ft_input(char *str, t_data *data, int *y, int j)
 	while (str[index + i] && str[index + i] != '<' && str[index + i] != '>'
 		&& str[index + i] != '\0' && str[index + i] != ' ')
 		i++;
-	printf("j = %d, i = %d, index = %d, str = [%s], mode = %d\n", j, i, index, str, data->input[j].modes[*y]);
 	data->input[j].files[*y] = ft_substr(str, index, i);
 	(*y)++;
 	return (i + index + 1);
@@ -358,6 +372,7 @@ int	ft_output(char *str, t_data *data, int *x, int j)
 	int	index;
 
 	i = 0;
+	data->output[j].id = 1;
 	if (str[0] == '>')
 	{
 		data->output[j].modes[*x] = 1;
@@ -393,7 +408,6 @@ int	ft_command(char *str, t_data *data, int *z, int j)
 		else
 			i++;
 	}
-	//printf("%d, %d\n", j, *z);
 	data->commands[j][*z] = ft_substr(str, 0, i);
 	(*z)++;
 	return (i);
@@ -411,7 +425,6 @@ void	ft_print_data(t_data *data)
 		i = 0;
 		while (data->commands[j][i] != NULL)
 		{
-			printf("i = %d\n", i);
 			printf("command [%d/%d] = [%s]\n", j , i, data->commands[j][i]);
 			i++;
 		}
@@ -422,8 +435,6 @@ void	ft_print_data(t_data *data)
 	while (data->input[j].id)
 	{
 		i = 0;
-		printf("id == [%d]\n", data->input[j].id);
-		printf("j = %d i = %d\n", j, i);
 		while (data->input[j].files[i] != NULL)
 		{
 			printf("infile [%d/%d] = [%s]   mode = %d\n", j , i, data->input[j].files[i], data->input[j].modes[i]);
@@ -431,19 +442,108 @@ void	ft_print_data(t_data *data)
 		}
 		j++;
 	}
+	printf("id = %d", data->input[0].id);
 	printf("\n---------OUTFILES--------\n\n");
 	j = 0;
 	while (data->output[j].id)
 	{
 		i = 0;
-		printf("id == [%d]\n", data->output[j].id);
-		printf("j = %d i = %d\n", j, i);
 		while (data->output[j].files[i] != NULL)
 		{
-			printf("enashrs\n");
 			printf("infile [%d/%d] = [%s]   mode = %d\n", j , i, data->output[j].files[i], data->output[j].modes[i]);
 			i++;
 		}
 		j++;
 	}
 }
+
+void	ft_close_pipes(t_data *data)
+{
+	close(data->fd[1][1]);
+	close(data->fd[1][0]);
+	close(data->fd[0][1]);
+	close(data->fd[0][0]);
+}
+void	ft_input_c(t_data *data, int i)
+{
+	char	*str;
+	int		fd;
+
+	if (data->input[data->counter].modes[i])
+	{
+		str = readline("> ");
+		write(data->fd[0][1], str, ft_strlen(str));//open ---- hay que decirle que pare de escribir con la palabra-end ---- Y si hay mas de un << palabra-start y palabra-end
+		free (str);
+	}
+	else
+		data->fd[0][1] = open(data->input[data->counter].files[i], O_RDONLY);
+	if (data->input[data->counter].files[i + 1] != NULL)
+		ft_input_c(data);
+}
+
+void	ft_output_c2(t_data *data, int i)
+{
+	if (!data->input[data->counter].modes[i])
+		data->fd[1][1]  = open(data->output[data->counter].files[i], O_WRONLY);
+	else
+		data->fd[1][1] = open(data->output[data->counter].files[i], O_WRONLY,  O_APPEND);
+}
+
+void	ft_output_c(t_data *data, int i)
+{
+	int	fd;
+	
+	if (!data->input[data->counter].modes[i])
+	{
+		fd = open(data->output[data->counter].files[i], O_WRONLY);
+		write(fd, NULL, 1);
+		close (fd);
+	}
+	i++;
+	if (data->output[data->counter].files[i + 1] == NULL)
+		ft_output_c2(data, i);
+	ft_close_pipes(data);
+}
+
+void	ft_rc_v2(t_data * data)
+{
+	ft_input_c(data, 0);
+	ft_output_c();
+	ft_cases();
+	ft_search_command(data,);
+}
+
+void	ft_init_v2(t_data * data)
+{
+	int	status;
+	int	w;
+	int	pid;
+
+	if (data->commands[data->counter] != NULL)
+	{
+		close(data->fd[0][1]);
+		pid = fork();
+		if (pid == -1)
+			return ;
+		if (pid == 0)
+			ft_rc_v2(data);
+		else
+		{
+			ft_error_child(waitpid(pid, &status, 0));
+			data->counter++;
+			if (data->commands[data->counter + 1] != NULL)
+				ft_init_v2(data);
+		}
+		
+	}
+	exit (0);
+}
+
+data_counters	pipes child
+
+recursive
+
+child
+recursive rotate through input
+execve
+recursive rotate through output
