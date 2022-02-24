@@ -21,12 +21,12 @@ int	ft_cases(char **command, t_data *data)
 		//printf("3exit\n");
 		exit(0);
 	}
-	if (ft_strncmp_sh(command[0], "exit", 4))
+	if (ft_strncmp_sh(command[0], "exit", 5))
 	{
 		printf("exit\n");
 		exit (0);
 	}
-	else if (ft_strncmp_sh(command[0], "env", 3))
+	else if (ft_strncmp_sh(command[0], "env", 4))
 		ft_superprintf(data->env);
 	else if (ft_strncmp_sh(command[0], "echo", 5) && ft_strncmp_sh(command[1], "-n", 3))
 		ft_echo(1, command[2]);
@@ -66,6 +66,7 @@ int	main(int argc, char *argv[], char *env[])
 	char				*str;
 	t_data				data;
 	struct sigaction	sa;
+	int					fd0[2];
 
 	(void)argv;
 	(void)argc;
@@ -75,17 +76,16 @@ int	main(int argc, char *argv[], char *env[])
 	//rl_catch_signals = 0;
 	sigaction(SIGQUIT, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
-	data.counter = 0;
 	while (1)
 	{
+		data.counter = 0;
 		str = readline("Notreallyshell > ");
+		pipe (fd0);
+		//ft_putstr(str);
 		add_history(str);
 		ft_bucle(&data, str, 0, 0);
-		//ft_print_data(&data);
-		ft_init(&data);
 		ft_print_data(&data);
+		ft_init(&data, fd0);
 		free (str);
-		str = NULL;
-		//ft_superfree(command);
 	}
 }

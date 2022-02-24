@@ -32,21 +32,24 @@ void	ft_search_command(t_data *data, char **command)
 	c = 0;
 	while (data->path[c] != NULL)
 	{
-		write(2, "lol\n", 4);
+		//write(2, "lol\n", 4);
 		temp = ft_strjoin(data->path[c], "/");
 		temp = ft_strjoin(temp, command[0]);
 		if (access(temp, X_OK) == 0)
 		{
-			ft_putstr(command[0]);
-			ft_print_fd(data->fd[0][0]);
+			//ft_putstr(command[0]);
+			//write(2, "\n", 1);
+			//ft_putstr(temp);
+			//write(2, "\n", 1);
+			//ft_print_fd(fd0[0]);
 			execve(temp, command, data->env);
 			exit(0);
 		}
 		free (temp);
 		c++;
-		write(2, "end\n", 4);
+		//write(2, "end\n", 4);
 	}
-	write(2, "nof\n", 4);
+	//write(2, "nof\n", 4);
 	ft_putstr(command[0]);
 	write(2, ": ", 2);
 	write(2, "command not found\n", 18);
@@ -135,7 +138,7 @@ void	ft_allocate2(t_data *data, char **pipes)
 		y = 0;
 		z = 0;
 		ft_allocate3(pipes[i], &x, &y, &z);
-		printf("x = %d,  y = %d, z = %d, i = %d\n", x, y, z, i);
+		//printf("x = %d,  y = %d, z = %d, i = %d\n", x, y, z, i);
 		data->input[i].files = malloc(sizeof(char *) * (y + 1));
 		data->input[i].files[y] = NULL;
 		data->input[i].modes = malloc(sizeof(char *) * (y + 1));
@@ -256,6 +259,7 @@ int	ft_output(char *str, t_data *data, int *x, int j)
 		i++;
 	data->output[j].files[*x] = ft_substr(str, index, i);
 	(*x)++;
+	data->output[j].id = 1;
 	return (i + index + 1);
 }
 
@@ -309,53 +313,68 @@ void	ft_print_data(t_data *data)
 		}
 		j++;
 	}
-	//printf("id = %d, mode = %d", data->input[0].id, data->input[0].modes[0]);
 	printf("\n---------OUTFILES--------\n\n");
+//	printf("id = %d, mode = %d\n", data->output[0].id, data->output[0].modes[0]);
 	j = 0;
 	while (data->output[j].id)
 	{
 		i = 0;
 		while (data->output[j].files[i] != NULL)
 		{
-			printf("infile [%d/%d] = [%s]   mode = %d\n", j , i, data->output[j].files[i], data->output[j].modes[i]);
+			printf("outfile [%d/%d] = [%s]   mode = %d\n", j , i, data->output[j].files[i], data->output[j].modes[i]);
 			i++;
 		}
 		j++;
 	}
 }
 
-void	ft_close_pipes(t_data *data)
-{
-	close(data->fd[1][1]);
-	close(data->fd[1][0]);
-	close(data->fd[0][1]);
-	close(data->fd[0][0]);
-}
-
-int	ft_input_c(t_data *data, int i)
+int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
 {
 	char	*str;
+	char	*temp;
+	int		c;
 
 	str = NULL;
 	if (data->input[data->counter].id != 1)
 		return (1);
 	if (data->input[data->counter].modes[i] == 1)
 	{
-		write(data->fd[0][1], NULL, 1);
-		while (!ft_strncmp(str, data->input[data->counter].files[i], ft_strlen(str)))
+		while (data->input[data->counter].files[i] != NULL)
 		{
-			str = readline("> ");
-			write(data->fd[0][1], str, ft_strlen(str));
-			free (str);
+			if (str != NULL)
+				free (str);
+			str = NULL;
+			c = 1;
+			while (c && !ft_strnstr(str, data->input[data->counter].files[i], ft_strlen(str)))
+			{
+				//printf("input = [%s]", data->input[data->counter].files[i]);
+				temp = readline("> ");
+				/*if (!ft_strnstr(temp, data->input[data->counter].files[i], ft_strlen(temp)))
+				{
+					printf("i = %d\n", i);
+					c = 0;
+					continue ;
+				}*/
+				str = ft_strjoin_ms(str, temp, ft_strlen(str), ft_strlen(temp));
+				str = ft_strjoin_ms(str, "\n", ft_strlen(str), 1);
+				free (temp);
+				//printf("str = [%s]\n", str);
+			}
+			i++;
 		}
+		printf("str = [%s]", str);
+		write(fd0[1], str, ft_strlen(str));
+		dup2(fd0[0], STDIN_FILENO);
+		return (0);
 	}
+	
 	else
-		data->fd[0][1] = open(data->input[data->counter].files[i], O_RDONLY);
+		fd0[1] = open(data->input[data->counter].files[i], O_RDONLY);
 	i++;
 	if (data->input[data->counter].files[i] != NULL)
-		ft_input_c(data, i);
+		ft_input_c(data, i, fd0, fd1);
 	else
-		dup2(data->fd[0][0], STDIN_FILENO);
+		dup2(fd0[0], STDIN_FILENO);
 	return (0);
 }
 
@@ -366,69 +385,62 @@ void	ft_print_fd(int fd)
 	write(2, str, 999);
 }
 
-int	ft_output_c(t_data *data, int i)
+int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
 {
 	int	fd;
 
-	if (data->input[data->counter].id != 1)
+	if (data->output[data->counter].id != 1)
 		return (1);
-	if (!data->input[data->counter].modes[i])
+	if (!data->output[data->counter].modes[i] && data->output[data->counter + 1].id)
 	{
+		write(2, "enter\n", 6);
 		fd = open(data->output[data->counter].files[i], O_WRONLY);
 		write(fd, NULL, 1);
 		close (fd);
 	}
-	i++;
-	if (data->output[data->counter].files[i] == NULL)
-		ft_output_c(data, i);
 	else
 	{
-		dup2(data->fd[1][1], STDOUT_FILENO);
+		fd = open(data->output[data->counter].files[i], O_RDONLY | O_WRONLY | O_TRUNC);
+		dup2(fd, STDOUT_FILENO);
+		return(0);
 	}
+	i++;
+	if (data->output[data->counter].files[i] != NULL)
+		ft_output_c(data, i, fd0, fd1);
 	return (0);
 }
 
-void	ft_rc(t_data * data)
+void	ft_rc(t_data * data, int fd0[2], int fd1[2])
 {
-	if (ft_input_c(data, 0) && data->counter)
-		dup2(data->fd[0][0], STDIN_FILENO);
-		//close(data->fd[0][0]);
-	ft_putstr(ft_itoa(data->counter));
-	if (ft_output_c(data, 0) && data->commands[data->counter + 1] != NULL)
-	{
-		dup2(data->fd[1][1], STDOUT_FILENO);
-		close(data->fd[1][1]);
-	}
-	//close(data->fd[0][1]);
-	close(data->fd[0][0]);
-	//close(data->fd[1][1]);
-	close(data->fd[1][0]);
+	if (ft_input_c(data, 0, fd0, fd1) && data->counter)
+		dup2(fd0[0], STDIN_FILENO);
+	if (ft_output_c(data, 0, fd0, fd1) && data->commands[data->counter + 1] != NULL)
+		dup2(fd1[1], STDOUT_FILENO);
+	close(fd0[1]);
+	close(fd1[1]);
+	close(fd1[0]);
+	close(fd0[0]);
 	ft_cases(data->commands[data->counter], data);
 	ft_search_command(data, data->commands[data->counter]);
 }
 
-void	ft_init(t_data *data)
+void	ft_init(t_data *data,int fd0[2])
 {
 	int	status;
 	int	pid;
+	int	fd1[2];
 
-	pipe(data->fd[0]);
-	pipe(data->fd[1]);
-	close(data->fd[1][0]);
-	//close(data->fd[0][1]);
+	close(fd0[1]);
+	pipe(fd1);
 	if (data->commands[data->counter] != NULL)
 	{
-		close(data->fd[0][1]);
 		pid = fork();
 		if (pid == -1)
 			return ;
 		if (pid == 0)
 		{
-			//close(data->fd[0][0]);
-			close(data->fd[1][0]);
-			close(data->fd[0][1]);
-			ft_rc(data);
-			exit (0);
+			close(fd0[1]);
+			ft_rc(data, fd0, fd1);
 		}
 		else
 		{
@@ -436,12 +448,8 @@ void	ft_init(t_data *data)
 			data->counter++;
 			if (data->commands[data->counter] != NULL)
 			{
-				write(2, "in\n", 3);
-				ft_print_fd(data->fd[0][0]);
-				//write(2, "out\n", 4);
-				//ft_print_fd(data->fd[1][0]);
-				data->fd[0][0] = data->fd[1][0];
-				ft_init(data);
+				fd0[0] = fd1[0];
+				ft_init(data, fd1);
 			}
 		}
 	}

@@ -62,14 +62,15 @@ void	ft_putstr(char *s);
 char	**ft_copy_2d(char **str);
 void	ft_print_data(t_data *data);
 void	ft_print_fd(int fd);
+char	*ft_strjoin_ms(char const *s1, char const *s2, int i, int c);
 
 /*--------------PROCESS----------------*/
 
 void		ft_search_command(t_data *data, char **command);
-int			ft_output_c(t_data *data, int i);
-int			ft_input_c(t_data *data, int i);
-void		ft_rc(t_data * data);
-void		ft_init(t_data * data);
+int			ft_output_c(t_data *data, int i,int fd0[2], int fd1[2]);
+int			ft_input_c(t_data *data, int i,int fd0[2], int fd1[2]);
+void		ft_rc(t_data * data,int fd0[2], int fd1[2]);
+void		ft_init(t_data * data, int fd0[2]);
 
 /*-----------------INPUT-----------------*/
 

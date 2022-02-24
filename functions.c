@@ -15,9 +15,9 @@
 void	ft_echo(int boo, char *str)
 {
 	if (boo)
-		printf("%s", str + 8);
+		printf("%s", str);
 	else
-		printf("%s\n", str + 5);
+		printf("%s\n", str);
 }
 
 void	ft_cd(char *str)
