@@ -300,7 +300,7 @@ void	ft_print_data(t_data *data)
 		}
 		j++;
 	}
-	//printf("id = %d, mode = %d", data->input[0].id, data->input[0].modes[0]);
+	printf("id = %d, mode = %d", data->input[0].id, data->input[0].modes[0]);
 	printf("\n---------INFILES--------\n\n");
 	j = 0;
 	while (data->input[j].id)
@@ -314,7 +314,7 @@ void	ft_print_data(t_data *data)
 		j++;
 	}
 	printf("\n---------OUTFILES--------\n\n");
-//	printf("id = %d, mode = %d\n", data->output[0].id, data->output[0].modes[0]);
+	printf("id = %d, mode = %d\n", data->output[0].id, data->output[0].modes[0]);
 	j = 0;
 	while (data->output[j].id)
 	{
@@ -335,7 +335,7 @@ void	ft_print_fd(int fd)
 	read(fd, str, 999);
 	write(2, str, 999);
 }
-
+/*
 int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
 {
 	int	fd;
@@ -346,12 +346,12 @@ int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
 	{
 		//write(2, "enter\n", 6);
 		fd = open(data->output[data->counter].files[i], O_WRONLY);
-		//write(fd, NULL, 1);
+		write(fd, NULL, 1);
 		close (fd);
 	}
 	else
 	{
-		fd = open(data->output[data->counter].files[i], O_RDONLY | O_WRONLY | O_TRUNC);
+		fd = open(data->output[data->counter].files[i], O_WRONLY |  O_APPEND);
 		dup2(fd, STDOUT_FILENO);
 		return(0);
 	}
@@ -359,7 +359,7 @@ int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
 	if (data->output[data->counter].files[i] != NULL)
 		ft_output_c(data, i, fd0, fd1);
 	return (0);
-}
+}*/
 
 void	ft_rc(t_data * data, int fd0[2], int fd1[2])
 {
@@ -477,7 +477,7 @@ int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
 			write(fd0[1], str, ft_strlen(str));
 	}
 	else
-		fd0[1] = open(data->input[data->counter].files[i], O_RDONLY);
+		fd0[0] = open(data->input[data->counter].files[i], O_RDONLY);
 	i++;
 	if (data->input[data->counter].files[i] != NULL)
 		ft_input_c(data, i, fd0, fd1);
@@ -487,5 +487,62 @@ int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
 		dup2(fd0[0], STDIN_FILENO);
 	}
 	close (fd0[1]);
+	return (0);
+}
+/*
+int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
+{
+	int	fd;
+
+	if (data->output[data->counter].id != 1)
+		return (1);
+	if (!data->output[data->counter].modes[i] && data->output[data->counter + 1].id)
+	{
+		//write(2, "enter\n", 6);
+		fd = open(data->output[data->counter].files[i], O_WRONLY);
+		write(fd, NULL, 1);
+		close (fd);
+	}
+	else
+	{
+		fd = open(data->output[data->counter].files[i], O_WRONLY |  O_APPEND);
+		dup2(fd, STDOUT_FILENO);
+		return(0);
+	}
+	i++;
+	if (data->output[data->counter].files[i] != NULL)
+		ft_output_c(data, i, fd0, fd1);
+	return (0);
+}
+*/
+int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
+{
+	int	fd;
+
+	if (data->output[data->counter].id != 1)
+		return (1);
+	if (data->output[data->counter].modes[i] && data->output[data->counter].files[i + 1] != NULL)
+		open(data->output[data->counter].files[i], O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	else if (!data->output[data->counter].modes[i] && data->output[data->counter].files[i + 1] != NULL)
+		open(data->output[data->counter].files[i], O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	else if (!data->output[data->counter].modes[i] && data->output[data->counter].files[i + 1] == NULL)
+	{
+		open(data->output[data->counter].files[i], O_TRUNC);
+		fd = open(data->output[data->counter].files[i], O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		dup2(fd, STDOUT_FILENO);
+		close (fd);
+		return(0);
+	}
+
+	else if (data->output[data->counter].modes[i] && data->output[data->counter].files[i + 1] == NULL)
+	{
+		fd = open(data->output[data->counter].files[i], O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		dup2(fd, STDOUT_FILENO);
+		close (fd);
+		return(0);
+	}
+	i++;
+	if (data->output[data->counter].files[i] != NULL)
+		ft_output_c(data, i, fd0, fd1);
 	return (0);
 }
