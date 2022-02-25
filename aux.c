@@ -344,9 +344,9 @@ int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
 		return (1);
 	if (!data->output[data->counter].modes[i] && data->output[data->counter + 1].id)
 	{
-		write(2, "enter\n", 6);
+		//write(2, "enter\n", 6);
 		fd = open(data->output[data->counter].files[i], O_WRONLY);
-		write(fd, NULL, 1);
+		//write(fd, NULL, 1);
 		close (fd);
 	}
 	else
@@ -371,7 +371,8 @@ void	ft_rc(t_data * data, int fd0[2], int fd1[2])
 	close(fd1[1]);
 	close(fd1[0]);
 	close(fd0[0]);
-	ft_cases(data->commands[data->counter], data);
+	if (ft_cases(data->commands[data->counter], data))
+		exit(0);
 	ft_search_command(data, data->commands[data->counter]);
 }
 
@@ -472,7 +473,8 @@ int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
 			str = ft_strjoin_ms(str, "\n", ft_strlen(str), 1);
 			free (temp);
 		}
-		write(fd0[1], str, ft_strlen(str));
+		if (data->input[data->counter].files[i + 1] == NULL)
+			write(fd0[1], str, ft_strlen(str));
 	}
 	else
 		fd0[1] = open(data->input[data->counter].files[i], O_RDONLY);
