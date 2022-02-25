@@ -328,55 +328,6 @@ void	ft_print_data(t_data *data)
 	}
 }
 
-int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
-{
-	char	*str;
-	char	*temp;
-	int		c;
-
-	str = NULL;
-	if (data->input[data->counter].id != 1)
-		return (1);
-	if (data->input[data->counter].modes[i] == 1)
-	{
-		while (data->input[data->counter].files[i] != NULL)
-		{
-			if (str != NULL)
-				free (str);
-			str = NULL;
-			c = 1;
-			while (c && !ft_strnstr(str, data->input[data->counter].files[i], ft_strlen(str)))
-			{
-				//printf("input = [%s]", data->input[data->counter].files[i]);
-				temp = readline("> ");
-				/*if (!ft_strnstr(temp, data->input[data->counter].files[i], ft_strlen(temp)))
-				{
-					printf("i = %d\n", i);
-					c = 0;
-					continue ;
-				}*/
-				str = ft_strjoin_ms(str, temp, ft_strlen(str), ft_strlen(temp));
-				str = ft_strjoin_ms(str, "\n", ft_strlen(str), 1);
-				free (temp);
-				//printf("str = [%s]\n", str);
-			}
-			i++;
-		}
-		printf("str = [%s]", str);
-		write(fd0[1], str, ft_strlen(str));
-		dup2(fd0[0], STDIN_FILENO);
-		return (0);
-	}
-	
-	else
-		fd0[1] = open(data->input[data->counter].files[i], O_RDONLY);
-	i++;
-	if (data->input[data->counter].files[i] != NULL)
-		ft_input_c(data, i, fd0, fd1);
-	else
-		dup2(fd0[0], STDIN_FILENO);
-	return (0);
-}
 
 void	ft_print_fd(int fd)
 {
@@ -430,7 +381,6 @@ void	ft_init(t_data *data,int fd0[2])
 	int	pid;
 	int	fd1[2];
 
-	close(fd0[1]);
 	pipe(fd1);
 	if (data->commands[data->counter] != NULL)
 	{
@@ -439,11 +389,12 @@ void	ft_init(t_data *data,int fd0[2])
 			return ;
 		if (pid == 0)
 		{
-			close(fd0[1]);
+			//close(fd0[1]);
 			ft_rc(data, fd0, fd1);
 		}
 		else
 		{
+			close(fd0[1]);
 			ft_error_child(waitpid(pid, &status, 0));
 			data->counter++;
 			if (data->commands[data->counter] != NULL)
@@ -453,4 +404,86 @@ void	ft_init(t_data *data,int fd0[2])
 			}
 		}
 	}
+}
+
+/*
+int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
+{
+	char	*str;
+	char	*temp;
+	int		c;
+	int		fd;
+
+	str = NULL;
+	if (data->input[data->counter].id != 1)
+		return (1);
+	if (data->input[data->counter].modes[i] == 1)
+	{
+		while (data->input[data->counter].files[i] != NULL)
+		{
+			if (str != NULL)
+				free (str);
+			str = NULL;
+			c = 1;
+			while (c && !ft_strnstr(str, data->input[data->counter].files[i], ft_strlen(str)))
+			{
+				temp = readline("> ");
+				str = ft_strjoin_ms(str, temp, ft_strlen(str), ft_strlen(temp));
+				str = ft_strjoin_ms(str, "\n", ft_strlen(str), 1);
+				free (temp);
+				//printf("str = [%s]\n", str);
+			}
+			i++;
+		}
+		fd = fd0[1];
+		printf("str = [%s]\n", str);
+		write(fd, str, ft_strlen(str));
+		ft_print_fd(fd0[0]);
+		dup2(fd0[0], STDIN_FILENO);
+		close (fd);
+		return (0);
+	}
+	else
+		fd0[1] = open(data->input[data->counter].files[i], O_RDONLY);
+	i++;
+	if (data->input[data->counter].files[i] != NULL)
+		ft_input_c(data, i, fd0, fd1);
+	else
+		dup2(fd0[0], STDIN_FILENO);
+	return (0);
+}
+*/
+int	ft_input_c(t_data *data, int i, int fd0[2], int fd1[2])
+{
+	char	*str;
+	char	*temp;
+
+	str = NULL;
+	if (data->input[0].id != 1)
+		return (1);
+	if (data->input[data->counter].modes[i] == 1)
+	{
+		while (!ft_strnstr(str, data->input[data->counter].files[i], ft_strlen(str)))
+		{
+			temp = readline("> ");
+			if (ft_strnstr(temp, data->input[data->counter].files[i], ft_strlen(temp)))
+				break ;
+			str = ft_strjoin_ms(str, temp, ft_strlen(str), ft_strlen(temp));
+			str = ft_strjoin_ms(str, "\n", ft_strlen(str), 1);
+			free (temp);
+		}
+		write(fd0[1], str, ft_strlen(str));
+	}
+	else
+		fd0[1] = open(data->input[data->counter].files[i], O_RDONLY);
+	i++;
+	if (data->input[data->counter].files[i] != NULL)
+		ft_input_c(data, i, fd0, fd1);
+	else
+	{
+		//ft_print_fd(fd0[0]);
+		dup2(fd0[0], STDIN_FILENO);
+	}
+	close (fd0[1]);
+	return (0);
 }
