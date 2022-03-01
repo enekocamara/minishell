@@ -84,7 +84,9 @@ int	main(int argc, char *argv[], char *env[])
 		//ft_putstr(str);
 		add_history(str);
 		ft_bucle(&data, str, 0, 0);
-		ft_print_data(&data);
+		//ft_print_data(&data);
+		ft_expansion(&data, 0);
+		//ft_print_data(&data);
 		ft_init(&data, fd0);
 		free (str);
 	}

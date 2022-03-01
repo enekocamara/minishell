@@ -59,7 +59,7 @@ void	ft_superprintf(char **str)
 	int	c;
 
 	c = 0;
-	if (!str || !str[0])
+	if (!str)
 		return ;
 	while (str[c])
 	{
@@ -127,3 +127,34 @@ char	*ft_strjoin_ms(char const *s1, char const *s2, int i, int c)
 	return (strjoin);
 }
 
+char	*ft_superjoin(char **s)
+{
+	char	*strjoin;
+	int		j;
+	int		i;
+
+	i = 0;
+	j = 0;
+	while (s[j] != NULL)
+	{
+		i = i + ft_strlen(s[j]);
+		j++;
+	}
+	strjoin = (char *) malloc(i + 1);
+	if (!strjoin)
+		return (0);
+	j = 0;
+	while (s[j] != NULL)
+	{
+		i = 0;
+		while (s[j][i] != '\0')
+		{
+			strjoin[i] = s[j][i];
+			i++;
+		}
+		j++;
+	}
+	strjoin[i] = '\0';
+	//printf("str2 = [%s] %d \n", strjoin, j);
+	return (strjoin);
+}

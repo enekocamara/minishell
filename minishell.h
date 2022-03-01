@@ -63,6 +63,7 @@ char	**ft_copy_2d(char **str);
 void	ft_print_data(t_data *data);
 void	ft_print_fd(int fd);
 char	*ft_strjoin_ms(char const *s1, char const *s2, int i, int c);
+char	*ft_superjoin(char **s);
 
 /*--------------PROCESS----------------*/
 
@@ -79,6 +80,7 @@ int			ft_output(char *str, t_data *data, int *x, int j);
 int			ft_command(char *str, t_data *data, int *z, int j);
 void		ft_bucle(t_data *data,char *command, int x, int y);
 void		ft_allocate1(t_data  *data,  char **pipes);
+void		ft_expansion(t_data *data, int k);
 
 /*-----------------AUX-------------------*/
 

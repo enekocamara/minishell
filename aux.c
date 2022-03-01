@@ -546,3 +546,84 @@ int	ft_output_c(t_data *data, int i, int fd0[2], int fd1[2])
 		ft_output_c(data, i, fd0, fd1);
 	return (0);
 }
+
+char	*ft_comma2(char **temp, char *str, int boo)
+{
+	int	x;
+	int	i;
+	int	index;
+
+	i = 0;
+	index = 0;
+	x = 0;
+	while(str[i] != '\0')
+	{
+		while (str[i] && str[i] != '$')
+				i++;
+		if (boo && str[index] == '$')
+		{
+			temp[x] = getenv(ft_substr(str, index + 1, i));
+		}
+		else
+				temp[x] = ft_substr(str, index, i);
+			index = i;
+		if (temp[x] == NULL)
+			temp[x] = "\0";
+		x++;
+		i++;
+	}
+	temp[x] = NULL;
+	return (ft_superjoin(temp));
+}
+
+char	*ft_comma(int boo, char *str)
+{
+	int		i;
+	char	**temp;
+	int		count;
+	char	*final;
+
+	temp = 0;
+	count = 0;
+	i = 0;
+	if (boo)
+	{
+		while (str[i] != '\0')
+		{
+			if (str[i] == '$')
+				count++;
+			i++;
+		}
+	}
+	else
+		count = 1;
+	temp = malloc (sizeof(char *) * (count * 2 + 2));
+	temp[count * 2 + 1] = NULL; 
+	final = ft_comma2(temp, str, boo);
+//	ft_superfree(temp);
+	return (final);
+}
+
+void	ft_expansion(t_data *data, int k)
+{
+	int		j;
+	char	*temp;
+
+	j = 1;
+	while (data->commands[k] != NULL && data->commands[k][j] != NULL)
+	{
+		if (data->commands[k][j][0] == '\'')
+			temp = ft_comma(0, ft_substr(data->commands[k][j],
+					1, ft_strlen(data->commands[k][j]) - 2));
+		else if (data->commands[k][j][0] == '\"')
+			temp = ft_comma(1, ft_substr(data->commands[k][j],
+					1, ft_strlen(data->commands[k][j]) - 2));
+		free (data->commands[k][j]);
+		//printf("str = [%s]\n", temp);
+		data->commands[k][j] = temp;
+		j++;
+	}
+	k++;
+	if (data->commands[k] != NULL)
+		ft_expansion(data, k);
+}
