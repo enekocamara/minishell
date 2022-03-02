@@ -64,11 +64,16 @@ int	ft_pass3(char *str)
 	i = 0;
 	while (str[i] == ' ')
 		i++;
-	while (str[i] && str[i] != '<' && str[i] != '>'
-		&& str[i] != '\0' && str[i] != ' ')
+	if (str[i] == '\'' || str[i] == '\"')
 	{
-		if (str[i] == '\'' || str[i] == '\"')
-			i += ft_pass(str, str[i]);
+		i += ft_pass(str, str[i]);
+		i++;
+		return (i);
+	}
+	i++;
+	while (str[i] && str[i] != '<' && str[i] != '>'
+		&& str[i] != '\0' && str[i] != ' ' && str[i] != '\'' && str[i] != '\"')
+	{
 		i++;
 	}
 	return (i);
@@ -261,18 +266,17 @@ int	ft_command(char *str, t_data *data, int *z, int j)
 	i = 0;
 	while (str[i] == ' ')
 		i++;
-	while (str[i] && str[i] != '<' && str[i] != '>'
-		&& str[i] != '\0' && str[i] != ' ')
+	if (str[i] == '\'' || str[i] == '\"')
 	{
-		if (str[i] == '\'' || str[i] == '\"')
-		{
-			printf("return i = %d\n", ft_pass(str, str[i]));
-			i += ft_pass(str, str[i]);
-			i++;
-			break ;
-		}
-		else
-			i++;
+		printf("return i = %d\n", ft_pass(str, str[i]));
+		i += ft_pass(str, str[i]);
+		i++;
+	}
+	else
+	{	
+		while (str[i] && str[i] != '<' && str[i] != '>'
+			&& str[i] != '\0' && str[i] != ' ' && str[i] != '\'' && str[i] != '\"')
+				i++;
 	}
 	printf("str = [%s] i = %d\n",str, i);
 	data->commands[j][*z] = ft_substr(str, 0, i);
