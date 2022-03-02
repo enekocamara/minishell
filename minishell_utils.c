@@ -132,29 +132,32 @@ char	*ft_superjoin(char **s)
 	char	*strjoin;
 	int		j;
 	int		i;
+	int		k;
 
 	i = 0;
 	j = 0;
 	while (s[j] != NULL)
 	{
+		//printf("str = [%s]\n", s[j]);
 		i = i + ft_strlen(s[j]);
 		j++;
 	}
 	strjoin = (char *) malloc(i + 1);
+	strjoin[i] = '\0';
 	if (!strjoin)
 		return (0);
 	j = 0;
+	k = 0;
 	while (s[j] != NULL)
 	{
 		i = 0;
 		while (s[j][i] != '\0')
 		{
-			strjoin[i] = s[j][i];
+			strjoin[k] = s[j][i];
 			i++;
+			k++;
 		}
 		j++;
 	}
-	strjoin[i] = '\0';
-	//printf("str2 = [%s] %d \n", strjoin, j);
 	return (strjoin);
 }

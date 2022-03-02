@@ -79,7 +79,7 @@ int			ft_input(char *str, t_data *data, int *y, int j);
 int			ft_output(char *str, t_data *data, int *x, int j);
 int			ft_command(char *str, t_data *data, int *z, int j);
 void		ft_bucle(t_data *data,char *command, int x, int y);
-void		ft_allocate1(t_data  *data,  char **pipes);
+char		**ft_allocate1(t_data  *data, char *command);
 void		ft_expansion(t_data *data, int k);
 
 /*-----------------AUX-------------------*/

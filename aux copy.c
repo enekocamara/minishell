@@ -31,7 +31,7 @@ void	ft_search_command(t_data *data, char **command)
 
 	c = 0;
 	while (data->path[c] != NULL)
-	{
+	{6
 		temp = ft_strjoin(data->path[c], "/");
 		temp = ft_strjoin(temp, command[0]);
 		if (access(temp, X_OK) == 0)
@@ -130,7 +130,7 @@ void	ft_allocate2(t_data *data, char **pipes)
 		y = 0;
 		z = 0;
 		ft_allocate3(pipes[i], &x, &y, &z);
-		printf("x = %d,  y = %d, z = %d, i = %d\n", x, y, z, i);
+		//printf("x = %d,  y = %d, z = %d, i = %d\n", x, y, z, i);
 		data->input[i].files = malloc(sizeof(char *) * (y + 1));
 		data->input[i].files[y] = NULL;
 		data->input[i].modes = malloc(sizeof(char *) * (y + 1));
@@ -145,14 +145,12 @@ void	ft_allocate2(t_data *data, char **pipes)
 	}
 }
 
-char	**ft_allocate1(t_data *data, char *command)
+void	ft_allocate1(t_data  *data,  char **pipes)
 {
-	int		i;
-	int		j;
-	char	**pipes;
+	int	i;
+	int	j;
 
 	i = 0;
-	pipes = ft_split_ms(command, '|');
 	while (pipes != NULL && pipes[i] != NULL)
 		i++;
 	data->input = malloc(sizeof(t_files) * (i + 1));
@@ -167,7 +165,6 @@ char	**ft_allocate1(t_data *data, char *command)
 		j++;
 	}
 	ft_allocate2(data, pipes);
-	return (pipes);
 }
 
 void	ft_bucle(t_data *data,char *command, int x, int y)
@@ -177,9 +174,10 @@ void	ft_bucle(t_data *data,char *command, int x, int y)
 	int		z;
 	char	**pipes;
 
-	j = -1;
-	pipes = ft_allocate1(data, command);
-	while (pipes != NULL && pipes[++j] != NULL)
+	j = 0;
+	pipes = ft_split_ms(command, '|');
+	ft_allocate1(data, pipes);
+	while (pipes != NULL && pipes[j] != NULL)
 	{
 		i = 0;
 		x = 0;
@@ -192,10 +190,13 @@ void	ft_bucle(t_data *data,char *command, int x, int y)
 			else if ('<' == pipes[j][i])
 				i += ft_input(pipes[j] + i + 1, data, &y, j);
 			else if (32 != pipes[j][i])
+			{
 				i += ft_command((pipes[j]) + i, data, &z, j);
+			}
 			else
 				i++;
 		}
+		j++;
 	}
 }
 
