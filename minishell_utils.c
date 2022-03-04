@@ -44,7 +44,7 @@ int	ft_strncmp_sh(const char *str1, const char *str2, size_t n, int cs)
 
 	c = 0;
 	(void)n;
-	if (!str1 || !str2)
+	if (!str1 || !str2 || str1[0] == '\0')
 		return (0);
 	i = 0;
 	while (str1[i] && str2[i])

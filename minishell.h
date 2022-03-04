@@ -82,6 +82,7 @@ int			ft_command(char *str, t_data *data, int *z, int j);
 void		ft_bucle(t_data *data,char *command, int x, int y);
 char		**ft_allocate1(t_data  *data, char *command);
 void		ft_expansion(t_data *data, int k);
+char		*ft_comma2(char **temp, char *str, int boo);
 
 /*-----------------AUX-------------------*/
 

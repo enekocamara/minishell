@@ -16,7 +16,6 @@
 
 int	ft_cases(char **command, t_data *data)
 {
-	ft_print_data(data);
 	if (command[0] == NULL)
 	{
 		//printf("3exit\n");
@@ -41,7 +40,7 @@ int	ft_cases(char **command, t_data *data)
 		ft_cd(command[1], data);
 	else
 		return (0);
-	printf("in cases\n");
+	//printf("in cases\n");
 	return (1);
 }
 
@@ -82,10 +81,14 @@ int	main(int argc, char *argv[], char *env[])
 	{
 		data.counter = 0;
 		str = readline("Notreallyshell > ");
+		if (str == NULL || str[0] == '\0')
+			continue ;
 		pipe (fd0);
 		add_history(str);
 		ft_bucle(&data, str, 0, 0);
+		ft_print_data(&data);
 		ft_expansion(&data, 0);
+		ft_print_data(&data);
 		if (data.commands[1] == NULL)
 		{
 			if(!ft_cases(data.commands[0], &data))
@@ -93,6 +96,8 @@ int	main(int argc, char *argv[], char *env[])
 				ft_init(&data, fd0);
 			}
 		}
+		else
+			ft_init(&data, fd0);
 		free (str);
 	}
 }

@@ -22,12 +22,13 @@ void	ft_echo(int boo, char **str)
 		i = 1;
 	while (str[i] != NULL)
 	{
-		if (boo)
-			printf("%s", str[i]);
-		else
-			printf("%s\n", str[i]);
+		printf("%s", str[i]);
+		if (str[i][0] != '\0')
+			printf(" ");
 		i++;
 	}
+	if (!boo)
+		printf("\n");
 }
 
 void	ft_cd(char *str, t_data *data)
