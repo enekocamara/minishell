@@ -53,9 +53,10 @@ typedef struct s_data
 
 /*----------------UTILS-----------------*/
 
+int	ft_search_str_ms(char **str, char *str2, int cs);
 void	ft_strdel(char **as);
 char	**ft_split_ms(char *str, char c);
-int		ft_strncmp_sh(const char *str1, const char *str2, size_t n);
+int		ft_strncmp_sh(const char *str1, const char *str2, size_t n, int cs);
 void	ft_superprintf(char **str);
 void	ft_superfree(char **str);
 void	ft_putstr(char *s);
@@ -91,8 +92,8 @@ int	ft_pass2(char *str, char c);
 /*---------------BUILDINS----------------*/
 
 int		ft_cases(char **command, t_data *data);
-void	ft_echo(int boo, char *str);
-void	ft_cd(char *str);
+void	ft_echo(int boo, char **str);
+void	ft_cd(char *str, t_data *data);
 
 /*-----------------ERROR-----------------*/
 

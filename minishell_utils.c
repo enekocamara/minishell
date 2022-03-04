@@ -12,7 +12,32 @@
 
 #include "minishell.h"
 
-int	ft_strncmp_sh(const char *str1, const char *str2, size_t n)
+int	ft_search_str_ms(char **str, char *str2, int cs)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != NULL)
+	{
+		if (ft_strncmp_sh(str[i], str2, ft_strlen(str[i]), cs))
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
+static int	ft_chrcmp_cis(char c1, char c2)
+{
+	if (c1 <= 122 && c1 >= 97)
+		c1 -= 32;
+	if (c2 <= 122 && c2 >= 97)
+		c2 -= 32;
+	if (c1 == c2)
+		return (1);
+	return (0);
+}
+
+int	ft_strncmp_sh(const char *str1, const char *str2, size_t n, int cs)
 {
 	unsigned int	c;
 	int				i;
@@ -24,12 +49,16 @@ int	ft_strncmp_sh(const char *str1, const char *str2, size_t n)
 	i = 0;
 	while (str1[i] && str2[i])
 	{
-		if (str1[i] != str2[i])
+		if (!cs && !ft_chrcmp_cis(str1[i], str2[i]))
+			return (0);
+		else if(cs && str1[i] !=  str2[i])
 			return (0);
 		i++;
 	}
 	return (1);
 }
+
+
 
 char	**ft_copy_2d(char **str)
 {
@@ -63,7 +92,7 @@ void	ft_superprintf(char **str)
 		return ;
 	while (str[c])
 	{
-		printf("[%s]\n", str[c]);
+		printf("%s\n", str[c]);
 		c++;
 	}
 }

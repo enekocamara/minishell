@@ -135,7 +135,7 @@ void	ft_allocate2(t_data *data, char **pipes)
 		y = 0;
 		z = 0;
 		ft_allocate3(pipes[i], &x, &y, &z);
-		printf("x = %d,  y = %d, z = %d, i = %d\n", x, y, z, i);
+		//printf("x = %d,  y = %d, z = %d, i = %d\n", x, y, z, i);
 		data->input[i].files = malloc(sizeof(char *) * (y + 1));
 		data->input[i].files[y] = NULL;
 		data->input[i].modes = malloc(sizeof(char *) * (y + 1));
@@ -268,7 +268,6 @@ int	ft_command(char *str, t_data *data, int *z, int j)
 		i++;
 	if (str[i] == '\'' || str[i] == '\"')
 	{
-		printf("return i = %d\n", ft_pass(str, str[i]));
 		i += ft_pass(str, str[i]);
 		i++;
 	}
@@ -278,7 +277,6 @@ int	ft_command(char *str, t_data *data, int *z, int j)
 			&& str[i] != '\0' && str[i] != ' ' && str[i] != '\'' && str[i] != '\"')
 				i++;
 	}
-	printf("str = [%s] i = %d\n",str, i);
 	data->commands[j][*z] = ft_substr(str, 0, i);
 	(*z)++;
 	return (i);
@@ -481,7 +479,6 @@ char	*ft_comma2(char **temp, char *str, int boo)
 			temp[x] = getenv(ft_substr(str, index + 1, i - index - 1));
 			if (boo == 2 && temp[x] == NULL)
 			{
-				printf("str = [%s] boo = [%d]\n", str, boo);
 				temp[x] = ft_substr(str, index, i - index + 1);
 			}
 		}
@@ -543,7 +540,6 @@ void	ft_expansion(t_data *data, int k)
 		{
 			temp = ft_comma(2, ft_substr(data->commands[k][j], 0, ft_strlen(data->commands[k][j])));
 		}
-		printf("temp = [%s]\n", temp);
 		free (data->commands[k][j]);
 		data->commands[k][j] = temp;
 		j++;

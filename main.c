@@ -16,30 +16,32 @@
 
 int	ft_cases(char **command, t_data *data)
 {
+	ft_print_data(data);
 	if (command[0] == NULL)
 	{
 		//printf("3exit\n");
 		exit(0);
 	}
-	if (ft_strncmp_sh(command[0], "exit", 5))
+	if (ft_strncmp_sh(command[0], "exit", 5, 1))
 	{
 		printf("exit\n");
 		exit (0);
 	}
-	else if (ft_strncmp_sh(command[0], "env", 4))
+	else if (ft_strncmp_sh(command[0], "env", 4, 0))
 		ft_superprintf(data->env);
-	else if (ft_strncmp_sh(command[0], "echo", 5) && ft_strncmp_sh(command[1], "-n", 3))
-		ft_echo(1, command[2]);
-	else if (ft_strncmp_sh(command[0], "echo", 5))
-		ft_echo(0, command[1]);
+	else if (ft_strncmp_sh(command[0], "echo", 5, 0) && ft_strncmp_sh(command[1], "-n", 3, 1))
+		ft_echo(1, command);
+	else if (ft_strncmp_sh(command[0], "echo", 5, 0))
+		ft_echo(0, command);
 	/*else if (ft_strncmp_sh(command[0], "echo", 5))
 		printf("\n");*/
-	else if (ft_strncmp_sh(command[0], "pwd", 3))
+	else if (ft_strncmp_sh(command[0], "pwd", 3, 0))
 		printf("%s\n", getenv("PWD"));
-	else if (ft_strncmp_sh(command[0], "cd", 3))
-		ft_cd(command[1]);
+	else if (ft_strncmp_sh(command[0], "cd", 3, 1))
+		ft_cd(command[1], data);
 	else
 		return (0);
+	printf("in cases\n");
 	return (1);
 }
 
@@ -81,13 +83,16 @@ int	main(int argc, char *argv[], char *env[])
 		data.counter = 0;
 		str = readline("Notreallyshell > ");
 		pipe (fd0);
-		//ft_putstr(str);
 		add_history(str);
 		ft_bucle(&data, str, 0, 0);
-		ft_print_data(&data);
 		ft_expansion(&data, 0);
-		ft_print_data(&data);
-		ft_init(&data, fd0);
+		if (data.commands[1] == NULL)
+		{
+			if(!ft_cases(data.commands[0], &data))
+			{
+				ft_init(&data, fd0);
+			}
+		}
 		free (str);
 	}
 }
