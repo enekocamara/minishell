@@ -21,11 +21,17 @@
 #                                                                              #
 # **************************************************************************** #
 NAME	= minishell
-SRCS	=	main.c\
-			minishell_utils.c \
-			aux.c\
-			functions.c\
-			split_ms.c
+SRCS	=	main.c				\
+			./source/aux.c		\
+			./source/buildins.c	\
+			./source/error.c	\
+			./source/input.c	\
+			./source/input2.c	\
+			./source/process.c	\
+			./source/split_ms.c	\
+			./source/temp.c		\
+			./source/utils.c	\
+			./source/input3.c
 		
 OBJS	= ${SRCS:.c=.o}
 SNAME	= -fsanitize=address

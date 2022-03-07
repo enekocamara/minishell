@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 static int	freeo(char **list)
 {
@@ -22,15 +22,7 @@ static int	freeo(char **list)
 	free (list);
 	return (0);
 }
-int	ft_pass(char *str, char c)
-{
-	int	i;
 
-	i = 1;
-	while (str[i] && str[i] != c)
-		i++;
-	return (i);
-}
 int	count_ms(char *s, char c)
 {
 	int	i;

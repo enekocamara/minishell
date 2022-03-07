@@ -35,7 +35,7 @@ int	ft_cases(char **command, t_data *data)
 	/*else if (ft_strncmp_sh(command[0], "echo", 5))
 		printf("\n");*/
 	else if (ft_strncmp_sh(command[0], "pwd", 3, 0))
-		printf("%s\n", getenv("PWD"));
+		ft_get_pwd(data);
 	else if (ft_strncmp_sh(command[0], "cd", 3, 1))
 		ft_cd(command[1], data);
 	else
@@ -86,11 +86,11 @@ int	main(int argc, char *argv[], char *env[])
 		pipe (fd0);
 		add_history(str);
 		ft_bucle(&data, str, 0, 0);
-		ft_print_data(&data);
+		//ft_print_data(&data);
 		ft_expansion(&data, 0);
-		ft_print_data(&data);
 		if (data.commands[1] == NULL)
 		{
+			ft_mother(&data, fd0);
 			if(!ft_cases(data.commands[0], &data))
 			{
 				ft_init(&data, fd0);
