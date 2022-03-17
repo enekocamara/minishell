@@ -27,7 +27,7 @@ void	ft_cd(char *str, t_data *data)
 	if (row == -1)
 		return ;
 	data->env[row] = ft_strjoin(data->env[row], "/");
-	data->env[row] = ft_strjoin(data->env[row], str);;
+	data->env[row] = ft_strjoin(data->env[row], str);
 	chdir(data->env[row]);
 	opendir(data->env[row]);
 }

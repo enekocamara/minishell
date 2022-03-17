@@ -24,7 +24,6 @@ void	ft_search_command(t_data *data, char **command)
 	exit (0);
 }
 
-
 void	ft_init(t_data *data,int fd0[2])
 {
 	int	status;
@@ -38,10 +37,7 @@ void	ft_init(t_data *data,int fd0[2])
 		if (pid == -1)
 			return ;
 		if (pid == 0)
-		{
-			//close(fd0[1]);
 			ft_rc(data, fd0, fd1);
-		}
 		else
 		{
 			close(fd0[1]);

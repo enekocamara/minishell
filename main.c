@@ -6,7 +6,7 @@
 /*   By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/07 10:22:24 by ecamara           #+#    #+#             */
-/*   Updated: 2022/02/23 13:40:41 by ecamara          ###   ########.fr       */
+/*   Updated: 2022/03/17 12:57:49 by ecamara          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ int	ft_cases(char **command, t_data *data)
 void	ft_new_line(void)
 {
 	write(2, "\n", 1);
-	//rl_on_new_line();
-	//rl_replace_line("", 0);
-	//rl_redisplay();
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 void	sighandler(int signal, siginfo_t *a, void *b)
@@ -74,7 +74,7 @@ int	main(int argc, char *argv[], char *env[])
 	data.env = ft_copy_2d(env);
 	data.path = ft_split(getenv("PATH"), ':');
 	sa.sa_sigaction = sighandler;
-	//rl_catch_signals = 0;
+	rl_catch_signals = 0;
 	sigaction(SIGQUIT, &sa, NULL);
 	sigaction(SIGINT, &sa, NULL);
 	while (1)
@@ -86,8 +86,9 @@ int	main(int argc, char *argv[], char *env[])
 		pipe (fd0);
 		add_history(str);
 		ft_bucle(&data, str, 0, 0);
-		//ft_print_data(&data);
+		ft_print_data(&data);
 		ft_expansion(&data, 0);
+		//ft_print_data(&data);
 		if (data.commands[1] == NULL)
 		{
 			ft_mother(&data, fd0);
@@ -95,6 +96,8 @@ int	main(int argc, char *argv[], char *env[])
 			{
 				ft_init(&data, fd0);
 			}
+			dup2(0, STDOUT_FILENO);
+			dup2(0, STDIN_FILENO);
 		}
 		else
 			ft_init(&data, fd0);

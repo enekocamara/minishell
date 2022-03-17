@@ -10,16 +10,6 @@
 #                                                                              #
 # **************************************************************************** #
 
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: ecamara <ecamara@student.42.fr>            +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/01/07 11:49:38 by cdiaz-fl          #+#    #+#              #
-#    Updated: 2022/02/14 11:07:50 by oholgado         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
 NAME	= minishell
 SRCS	=	main.c				\
 			./source/aux.c		\
@@ -46,14 +36,15 @@ LIBFT	= -C ./libft
             -L/sgoinfre/goinfre/Perso/$(USER)/homebrew/opt/readline/lib\
 SFLAGS  = -fsanitize=address -g3
 CFLAGS  = -g3 -Wall -Werror -Wextra
-LDFLAGS = -lreadline -L/Users/$(USER)/.brew/opt/readline/lib/ -I/Users/$(USER)/.brew/opt/readline/include/readline/
+LDFLAGS = -lreadline -L/Users/$(USER)/.brew/opt/readline/lib/
+CPPFLAGS= -I/Users/$(USER)/.brew/opt/readline/include
 all: $(NAME)
 $(NAME) : $(OBJS)
 		echo "$(RED)Compiling...				⏳$(WHITE)"
 		make  ${LIBFT}/
-		$(CC) ${CFLAGS} ${LDFLAGS} $(SNAME) $^ -I. ./libft/libft.a -o $@    
+		$(CC) ${CFLAGS} ${LDFLAGS} $(CPPFLAGS) $(SNAME) $^ -I. ./libft/libft.a -o $@    
 %.o: %.c
-	$(CC) ${CFLAGS} -I/sgoinfre/goinfre/Perso/$(USER)/homebrew/opt/readline/include -I/sgoinfre/goinfre/Perso/$(USER)/homebrew/opt/readline/lib -c $< -o $@
+	$(CC) ${CFLAGS} $(CPPFLAGS) -c $< -o $@
 
 clean:
 		@ echo "$(RED)Clean in progress...		⏳$(WHITE)"

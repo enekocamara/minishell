@@ -39,7 +39,7 @@ int	ft_strncmp_sh(const char *str1, const char *str2, size_t n, int cs)
 	{
 		if (!cs && !ft_chrcmp_cis(str1[i], str2[i]))
 			return (0);
-		else if(cs && str1[i] !=  str2[i])
+		else if(cs && str1[i] != str2[i])
 			return (0);
 		i++;
 	}
